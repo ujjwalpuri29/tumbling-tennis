@@ -87,7 +87,7 @@ public class BallController : MonoBehaviour
 
         roundEnded = true;
 
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
         RoundSystem.Instance.EndRound(winner);
@@ -100,7 +100,7 @@ public class BallController : MonoBehaviour
 
         bounceCount = 0;
 
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
     }
     public bool GetLastHitPlayer(out Player player)

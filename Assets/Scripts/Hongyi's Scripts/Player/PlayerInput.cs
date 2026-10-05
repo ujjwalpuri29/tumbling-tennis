@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum MouseHitButton
 {
-    Left = 0,
-    Right = 1,
-    Middle = 2
+    Left,
+    Right,
+    Middle
 }
 
 public class PlayerInput : MonoBehaviour
@@ -12,97 +13,105 @@ public class PlayerInput : MonoBehaviour
     private PlayerController controller;
 
     [Header("Primary Controls")]
-    [SerializeField]
-    KeyCode left = KeyCode.A;
-
-    [SerializeField]
-    KeyCode right = KeyCode.D;
-
-    [SerializeField]
-    KeyCode jump = KeyCode.W;
-
-    [SerializeField]
-    KeyCode softHit = KeyCode.LeftShift;
-
-    [SerializeField]
-    KeyCode hardHit = KeyCode.LeftControl;
+    [SerializeField] private Key left = Key.A;
+    [SerializeField] private Key right = Key.D;
+    [SerializeField] private Key jump = Key.W;
+    [SerializeField] private Key softHit = Key.LeftShift;
+    [SerializeField] private Key hardHit = Key.LeftCtrl;
 
     [Header("Single Player Alternate Movement")]
-    [SerializeField]
-    private KeyCode alternateLeft = KeyCode.LeftArrow;
-
-    [SerializeField]
-    private KeyCode alternateRight = KeyCode.RightArrow;
-
-    [SerializeField]
-    private KeyCode alternateJump = KeyCode.UpArrow;
+    [SerializeField] private Key alternateLeft = Key.LeftArrow;
+    [SerializeField] private Key alternateRight = Key.RightArrow;
+    [SerializeField] private Key alternateJump = Key.UpArrow;
 
     [Header("Single Player Hit Controls")]
-    [SerializeField]
-    private KeyCode singlePlayerSoftHit = KeyCode.Space;
-
-    [SerializeField]
-    private KeyCode singlePlayerHardHit = KeyCode.C;
+    [SerializeField] private Key singlePlayerSoftHit = Key.Space;
+    [SerializeField] private Key singlePlayerHardHit = Key.C;
 
     [Header("Mouse Hit Controls")]
-    [SerializeField]
-    private bool enableMouseHits = true;
-
-    [SerializeField]
-    private MouseHitButton softHitMouseButton = MouseHitButton.Left;
-
-    [SerializeField]
-    private MouseHitButton hardHitMouseButton = MouseHitButton.Right;
+    [SerializeField] private bool enableMouseHits = true;
+    [SerializeField] private MouseHitButton softHitMouseButton = MouseHitButton.Left;
+    [SerializeField] private MouseHitButton hardHitMouseButton = MouseHitButton.Right;
 
     private void Awake()
     {
         controller = GetComponent<PlayerController>();
+        if (controller == null)
+        {
+            Debug.LogError(
+                "PlayerInput requires a PlayerController on the same GameObject.",
+                this
+            );
+
+            enabled = false;
+        }
     }
 
     void Update()
     {
+        Keyboard keyboard = Keyboard.current;
+        Mouse mouse = Mouse.current;
+
         bool isSinglePlayerHuman = (controller.PlayerID == Player.playerOne) &&
             (ModeChoose.Instance != null) && (ModeChoose.Instance.gameType == GameType.PVE);
 
         controller.horizontalMoveDir = 0;
 
-        if (Input.GetKey(left) || (isSinglePlayerHuman && Input.GetKey(alternateLeft)))
+        if (keyboard != null)
         {
-            controller.horizontalMoveDir -= 1;
-        }
+            if (keyboard[left].isPressed || (isSinglePlayerHuman && keyboard[alternateLeft].isPressed))
+            {
+                controller.horizontalMoveDir--;
+            }
 
-        if (Input.GetKey(right) || (isSinglePlayerHuman && Input.GetKey(alternateRight)))
-        {
-            controller.horizontalMoveDir += 1;
-        }
+            if (keyboard[right].isPressed || (isSinglePlayerHuman && keyboard[alternateRight].isPressed))
+            {
+                controller.horizontalMoveDir++;
+            }
 
-        if (Input.GetKeyDown(jump) || (isSinglePlayerHuman && Input.GetKeyDown(alternateJump)))
-        {
-            controller.ifJump = true;
-        }
+            if (keyboard[jump].wasPressedThisFrame || (isSinglePlayerHuman && keyboard[alternateJump].wasPressedThisFrame))
+            {
+                controller.ifJump = true;
+            }
 
-        bool useMouseHits = enableMouseHits && (controller.PlayerID == Player.playerTwo || isSinglePlayerHuman);
+            bool softHitPressed = keyboard[softHit].wasPressedThisFrame ||
+                                  (isSinglePlayerHuman && keyboard[singlePlayerSoftHit].wasPressedThisFrame);
 
-        bool softHitPressed = Input.GetKeyDown(softHit) ||
-                              (isSinglePlayerHuman && Input.GetKeyDown(singlePlayerSoftHit));
+            bool hardHitPressed = keyboard[hardHit].wasPressedThisFrame ||
+                                  (isSinglePlayerHuman && keyboard[singlePlayerHardHit].wasPressedThisFrame);
 
-        bool hardHitPressed = Input.GetKeyDown(hardHit) ||
-                              (isSinglePlayerHuman && Input.GetKeyDown(singlePlayerHardHit));
+            bool useMouseHits = enableMouseHits && (controller.PlayerID == Player.playerTwo || isSinglePlayerHuman);
 
-        if (useMouseHits)
-        {
-            softHitPressed |= Input.GetMouseButtonDown((int)softHitMouseButton);
-            hardHitPressed |= Input.GetMouseButtonDown((int)hardHitMouseButton);
-        }
+            if (useMouseHits && mouse != null)
+            {
+                if (softHitMouseButton == MouseHitButton.Left)
+                {
+                    softHitPressed |= mouse.leftButton.wasPressedThisFrame;
+                }
+                else if (softHitMouseButton == MouseHitButton.Right)
+                {
+                    softHitPressed |= mouse.rightButton.wasPressedThisFrame;
+                }
 
-        if (softHitPressed)
-        {
-            controller.ifHit = 1;
-        }
+                if (hardHitMouseButton == MouseHitButton.Left)
+                {
+                    hardHitPressed |= mouse.leftButton.wasPressedThisFrame;
+                }
+                else if (hardHitMouseButton == MouseHitButton.Right)
+                {
+                    hardHitPressed |= mouse.rightButton.wasPressedThisFrame;
+                }
+            }
 
-        if (hardHitPressed)
-        {
-            controller.ifHit = 2;
+            if (softHitPressed)
+            {
+                controller.ifHit = 1;
+            }
+
+            if (hardHitPressed)
+            {
+                controller.ifHit = 2;
+            }
         }
     }
 }

@@ -100,14 +100,14 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float horizontalSpeed = movingSpeed * horizontalMoveDir;
-        Vector2 newSpeed = rb.velocity;
+        Vector2 newSpeed = rb.linearVelocity;
         newSpeed.x = horizontalSpeed;
         if (ifJump && IsGrounded())
         {
             newSpeed.y = jumpSpeed;
         }
         ifJump = false;
-        rb.velocity = newSpeed;
+        rb.linearVelocity = newSpeed;
     }
     private bool IsGrounded()
     {
@@ -151,11 +151,11 @@ public class PlayerController : MonoBehaviour
 
         if (bufferedHit == 1)
         {
-            ball.velocity = softHitForce * hitDir;
+            ball.linearVelocity = softHitForce * hitDir;
         }
         else if (bufferedHit == 2)
         {
-            ball.velocity = hardHitForce * hitDir;
+            ball.linearVelocity = hardHitForce * hitDir;
         }
         ClearHitBuffer();
     }
@@ -177,7 +177,7 @@ public class PlayerController : MonoBehaviour
     }
     public void ResetPlayer(Vector2 position)
     {
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
         transform.position = position;

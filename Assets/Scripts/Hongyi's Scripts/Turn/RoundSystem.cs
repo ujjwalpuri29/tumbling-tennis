@@ -93,7 +93,7 @@ public class RoundSystem : MonoBehaviour
             ballRb.transform.position = playerTwoServePoint.position;
             ballRb.position = playerTwoServePoint.position;
         }
-        ballRb.velocity = Vector2.zero;
+        ballRb.linearVelocity = Vector2.zero;
         ballRb.angularVelocity = 0f;
         Physics2D.SyncTransforms();
         Time.timeScale = 0f;
