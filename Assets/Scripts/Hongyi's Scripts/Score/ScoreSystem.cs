@@ -11,6 +11,8 @@ public class ScoreSystem : MonoBehaviour
     [SerializeField]
     private TMP_Text winnerTxt;
     [SerializeField]
+    private GameObject winnerPanel;
+    [SerializeField]
     private int playerOne = 0;
     [SerializeField]
     private int playerTwo = 0;
@@ -31,7 +33,11 @@ public class ScoreSystem : MonoBehaviour
     private void Start()
     {
         UpdateScore();
-        if (winnerTxt != null)
+        if (winnerPanel != null)
+        {
+            winnerPanel.SetActive(false);
+        }
+        else if (winnerTxt != null)
         {
             winnerTxt.gameObject.SetActive(false);
         }
@@ -64,16 +70,27 @@ public class ScoreSystem : MonoBehaviour
     private void EndGame(Player winner)
     {
         gameEnded = true;
+
+        if (scoreTxt != null)
+        {
+            scoreTxt.gameObject.SetActive(false);
+        }
+
+        if (winnerPanel != null)
+        {
+            winnerPanel.SetActive(true);
+        }
+
         if (winnerTxt != null)
         {
             winnerTxt.gameObject.SetActive(true);
             if (winner == Player.playerOne)
             {
-                winnerTxt.text = "Player 1 Wins!";
+                winnerTxt.text = $"Player 1 Wins!\nFinal Score: {playerOne} : {playerTwo}";
             }
             else
             {
-                winnerTxt.text = "Player 2 Wins!";
+                winnerTxt.text = $"Player 2 Wins!\nFinal Score: {playerOne} : {playerTwo}";
             }
         }
         Time.timeScale = 0f;
@@ -83,7 +100,10 @@ public class ScoreSystem : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(returnDelay);
         Time.timeScale = 1f;
-        ModeChoose.Instance.BackToStart();
+        if (ModeChoose.Instance != null)
+        {
+            ModeChoose.Instance.BackToStart();
+        }
         SceneManager.LoadScene("StartPage");
     }
     public void ResetScore()
@@ -91,8 +111,16 @@ public class ScoreSystem : MonoBehaviour
         playerOne = 0;
         playerTwo = 0;
         gameEnded = false;
+        if (scoreTxt != null)
+        {
+            scoreTxt.gameObject.SetActive(true);
+        }
         UpdateScore();
-        if (winnerTxt != null)
+        if (winnerPanel != null)
+        {
+            winnerPanel.SetActive(false);
+        }
+        else if (winnerTxt != null)
         {
             winnerTxt.gameObject.SetActive(false);
         }

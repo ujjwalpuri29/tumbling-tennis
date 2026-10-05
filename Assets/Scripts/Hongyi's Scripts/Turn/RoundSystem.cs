@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class RoundSystem : MonoBehaviour
 {
@@ -39,6 +40,7 @@ public class RoundSystem : MonoBehaviour
     private BubblePowerUpController bubblePowerUpController;
     private Player currentServer;
     private bool waitingForServe = false;
+    private bool isPaused = false;
 
     public bool WaitingForServe
     {
@@ -63,6 +65,19 @@ public class RoundSystem : MonoBehaviour
         ResetRound();
     }
 
+    private void Update()
+    {
+        Keyboard keyboard = Keyboard.current;
+
+        if (keyboard != null &&
+            keyboard.pKey.wasPressedThisFrame &&
+            !waitingForServe)
+        {
+            isPaused = !isPaused;
+            Time.timeScale = isPaused ? 0f : 1f;
+        }
+    }
+
     public void EndRound(Player winner)
     {
         bool gameEnded = ScoreSystem.Instance.AddScore(winner);
@@ -74,6 +89,8 @@ public class RoundSystem : MonoBehaviour
 
     private void ResetRound()
     {
+        isPaused = false;
+
         if (bubblePowerUpController != null)
         {
             bubblePowerUpController.ResetPowerUp();
@@ -108,6 +125,7 @@ public class RoundSystem : MonoBehaviour
             return false;
 
         waitingForServe = false;
+        isPaused = false;
         Time.timeScale = 1f;
 
         return true;
@@ -117,6 +135,7 @@ public class RoundSystem : MonoBehaviour
     {
         if (Instance == this)
         {
+            isPaused = false;
             Time.timeScale = 1f;
         }
     }
