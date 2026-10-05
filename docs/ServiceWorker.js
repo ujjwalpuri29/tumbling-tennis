@@ -1,9 +1,9 @@
 const cacheName = "DefaultCompany-Tumbling Tennis-1.0";
 const contentToCache = [
-    "Build/build.loader.js",
-    "Build/build.framework.js.unityweb",
-    "Build/build.data.unityweb",
-    "Build/build.wasm.unityweb",
+    "Build/docs.loader.js",
+    "Build/docs.framework.js.unityweb",
+    "Build/docs.data.unityweb",
+    "Build/docs.wasm.unityweb",
     "TemplateData/style.css"
 
 ];
